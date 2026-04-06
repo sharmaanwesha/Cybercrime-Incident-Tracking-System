@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login | CITS</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top left, #1a103d, #3e1b74, #6025ba);
+      color: #fff;
+      margin: 0;
+      overflow-x: hidden;
+    }
+    .hidden { display: none !important; }
+
+    nav {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .logo {
+      font-size: 1.7rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .page {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(25px);
+      border-radius: 25px;
+      padding: 2rem 3rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.8rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.9rem;
+      margin-top: 0.8rem;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      outline: none;
+      font-size: 1rem;
+    }
+
+    .btn {
+      width: 100%;
+      margin-top: 1.2rem;
+      padding: 0.9rem;
+      background: linear-gradient(90deg, #6c63ff, #b832fa);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 0 10px #a855f7; }
+
+    table { width: 100%; border-collapse: collapse; color: white; }
+    th, td { padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    th { background: rgba(255,255,255,0.1); }
+
+    .modal { position: fixed; top:0; left:0; right:0; bottom:0; display:flex; justify-content:center; align-items:center; background:rgba(0,0,0,0.6); backdrop-filter:blur(10px); }
+    .modal-content { background:rgba(255,255,255,0.1); padding:2rem; border-radius:20px; width:400px; }
+
+    .modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #1e293b;
+  padding: 2rem;
+  border-radius: 20px;
+  max-width: 600px;
+  width: 90%;
+  color: white;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.form-group {
+  margin-top: 1.2rem;
+}
+textarea,
+select {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.9);
+  color: #fff;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  resize: none;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cancel {
+  background: #64748b;
+}
+
+
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="logo">🔐 CITS Admin</div>
+  </nav>
+
+  <div id="loginPage" class="page">
+    <div class="card" style="max-width:400px;">
+      <h2>👤 Admin Login</h2>
+      <p>Sign in to manage cases, officers, and citizens</p>
+      <input id="email" type="email" placeholder="Email Address *" required />
+      <input id="password" type="password" placeholder="Password *" required />
+      <button class="btn" onclick="loginAdmin()">Login</button>
+    </div>
+  </div>
+
+  <div id="dashboardPage" class="hidden">
+    <div class="card" style="margin:2rem auto; max-width:1100px;">
+      <h2>👥 Citizens</h2>
+      <table id="citizenTable"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>City</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <div class="card" style="margin:2rem auto; max-width:1100px;">
+      <h2>👮 Officers <button class="btn" style="width:auto;padding:0.5rem 1rem;float:right;" onclick="openAddOfficer()">➕ Add Officer</button></h2>
+      <table id="officerTable"><thead><tr><th>ID</th><th>Name</th><th>Badge</th><th>Dept</th><th>Status</th><th>Action</th></tr></thead><tbody></tbody></table>
+    </div>
+
+    <div class="card" style="margin:2rem auto; max-width:1100px;">
+      <h2>🧾 Complaints</h2>
+      <table id="complaintTable"><thead><tr><th>Case ID</th><th>Type</th><th>Status</th><th>Urgency</th><th>Officer</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+<div class="card" style="margin:2rem auto; max-width:1100px;">
+  <h2>🧑‍💼 Admin Review Cases</h2>
+  <table id="adminReviewTable">
+    <thead>
+      <tr>
+        <th>Case ID</th>
+        <th>Crime Type</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+  <div id="addOfficerModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>➕ Add Officer</h3>
+      <input id="offName" placeholder="Full Name" />
+      <input id="offEmail" placeholder="Email" />
+      <input id="offPass" type="password" placeholder="Password" />
+      <input id="offPhone" placeholder="Phone" />
+      <input id="offBadge" placeholder="Badge Number" />
+      <input id="offDept" placeholder="Department" />
+      <input id="offRank" placeholder="Rank" />
+      <button class="btn" onclick="addOfficer()">Add Officer</button>
+      <button class="btn" style="background:#555;margin-top:10px;" onclick="closeAddOfficer()">Cancel</button>
+    </div>
+  </div>
+
+  
+<div id="manageCaseModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="caseTitle">Manage Case</h3>
+      <button class="close-btn" onclick="closeManageCase()">✕</button>
+    </div>
+    <div id="caseDetails"></div>
+
+    <div class="form-group">
+      <label>Status</label>
+      <select id="adminCaseStatus">
+        <option value="Pending">Pending</option>
+        <option value="Under Investigation">Under Investigation</option>
+        <option value="Closed">Closed</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Admin Notes</label>
+      <textarea id="adminCaseNotes" placeholder="Add remarks or progress update"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="updateCase()">💾 Save Changes</button>
+      <button class="btn cancel" onclick="closeManageCase()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+  <script>
+  const API_URL = 'http://localhost:5000/api';
+
+  function showAlert(message, type = 'info', title = '') {
+  
+  let container = document.getElementById('alertContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'alertContainer';
+    container.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    `;
+    document.body.appendChild(container);
+  }
+
+  const colors = {
+    success: '#10b981',
+    error: '#ef4444',
+    info: '#3b82f6'
+  };
+  const icons = {
+    success: '✅',
+    error: '❌',
+    info: 'ℹ️'
+  };
+  const bg = colors[type] || colors.info;
+  const icon = icons[type] || icons.info;
+
+  
+  const alertBox = document.createElement('div');
+  alertBox.style.cssText = `
+    background: ${bg};
+    color: white;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  `;
+  alertBox.innerHTML = `<span>${icon}</span><div><strong>${title || type.toUpperCase()}</strong><br>${message}</div>`;
+
+  
+  alertBox.onclick = () => alertBox.remove();
+  setTimeout(() => alertBox.remove(), 5000);
+
+  container.appendChild(alertBox);
+}
+
+
+  function getStatusColor(status) {
+  switch ((status || '').toLowerCase()) {
+    case 'pending':
+      return '#f59e0b'; 
+    case 'under investigation':
+      return '#3b82f6'; 
+    case 'closed':
+      return '#10b981'; 
+    case 'admin review':
+      return '#8b5cf6'; 
+    default:
+      return '#6b7280'; 
+  }
+}
+
+  function showDashboard() {
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('dashboardPage').classList.remove('hidden');
+    loadData();
+  }
+
+  function loginAdmin() {
+    fetch(API_URL + '/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.value, password: password.value })
+    })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) showDashboard();
+        else alert('Invalid credentials');
+      });
+  }
+
+function loadData() {
+  Promise.all([
+    fetch(API_URL + '/admin/citizens').then(r => r.json()),
+    fetch(API_URL + '/admin/officers').then(r => r.json()),
+    fetch(API_URL + '/admin/complaints').then(r => r.json())
+  ])
+  .then(([citizens, officers, complaints]) => {
+
+    if (citizens.success) {
+      document.querySelector('#citizenTable tbody').innerHTML = citizens.citizens
+        .map(c => `
+          <tr>
+            <td>${c.citizen_id}</td>
+            <td>${c.full_name}</td>
+            <td>${c.email}</td>
+            <td>${c.phone}</td>
+            <td>${c.city}</td>
+          </tr>
+        `).join('');
+    }
+    if (officers.success) {
+      document.querySelector('#officerTable tbody').innerHTML = officers.officers
+        .map(o => `
+          <tr>
+            <td>${o.officer_id}</td>
+            <td>${o.full_name}</td>
+            <td>${o.badge_number}</td>
+            <td>${o.department}</td>
+            <td>${o.is_active ? '🟢 Active' : '🔴 Inactive'}</td>
+            <td>
+              <button class="btn" style="padding:0.3rem 1rem;font-size:0.8rem"
+                onclick='toggleOfficer("${o.officer_id}")'>
+                ${o.is_active ? 'Deactivate' : 'Activate'}
+              </button>
+            </td>
+          </tr>
+        `).join('');
+    }
+
+    if (complaints.success) {
+      let officerHtml = '';
+      let adminHtml = '';
+
+      complaints.complaints.forEach(c => {
+        const handledByAdmin = parseInt(c.handled_by_admin) === 1;
+        const isClosed = (c.status || '').toLowerCase() === 'closed';
+
+        const assignedTo = handledByAdmin
+          ? '🧑‍💼 Admin'
+          : c.officer_name
+            ? `👮 ${c.officer_name}`
+            : `<span style="color:#f59e0b;">⏳ Pending</span>`;
+
+        let actionBtn = '';
+        if (isClosed) {
+          actionBtn = `<button class="btn" style="background:#6b7280;cursor:not-allowed;" disabled>Closed</button>`;
+        } 
+        else if (handledByAdmin) {
+          actionBtn = `
+            <button class="btn" style="background:#3b82f6;padding:0.3rem 1rem;font-size:0.8rem"
+              onclick="openAdminEditCase('${c.case_id}')">✏️ Manage Case</button>
+            <button class="btn" style="background:#10b981;padding:0.3rem 1rem;font-size:0.8rem;margin-left:10px;"
+              onclick="reassignCase('${c.case_id}')">🔄 Reassign</button>`;
+        } 
+        else {
+          actionBtn = `
+            <button class="btn" style="background:#ef4444;padding:0.3rem 1rem;font-size:0.8rem"
+              onclick="handleByAdmin('${c.case_id}')">🧑‍💼 Take Over</button>`;
+        }
+
+        const row = `
+          <tr>
+            <td>${c.case_id}</td>
+            <td>${c.crime_type}</td>
+            <td>${c.status}</td>
+            <td>${assignedTo}</td>
+            <td>${actionBtn}</td>
+          </tr>`;
+
+        if (handledByAdmin) adminHtml += row;
+        else officerHtml += row;
+      });
+
+      document.querySelector('#complaintTable tbody').innerHTML = officerHtml;
+      document.querySelector('#adminReviewTable tbody').innerHTML = adminHtml;
+    }
+
+  })
+  .catch(err => {
+    console.error("Error loading data:", err);
+    alert("Failed to load data. Please check server.");
+  });
+}
+
+
+  function toggleOfficer(id) {
+    fetch(API_URL + '/admin/toggle-officer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ officer_id: id })
+    })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) loadData();
+        else alert(d.message);
+      });
+  }
+
+  function openAddOfficer() {
+    document.getElementById('addOfficerModal').classList.remove('hidden');
+  }
+
+  function closeAddOfficer() {
+    document.getElementById('addOfficerModal').classList.add('hidden');
+  }
+
+  function addOfficer() {
+    fetch(API_URL + '/admin/add-officer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        full_name: offName.value,
+        email: offEmail.value,
+        password: offPass.value,
+        phone: offPhone.value,
+        badge_number: offBadge.value,
+        department: offDept.value,
+        officer_rank: offRank.value
+      })
+    })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) {
+          alert('Officer added');
+          closeAddOfficer();
+          loadData();
+        } else alert(d.message);
+      });
+  }
+
+  function handleByAdmin(caseId) {
+    if (!confirm(`Are you sure you want to take over Case ${caseId}?`)) return;
+    fetch(API_URL + '/admin/handle-complaint', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ case_id: caseId })
+    })
+      .then(r => r.json())
+      .then(d => {
+        alert(d.message);
+        loadData();
+      })
+      .catch(() => alert('Error taking over case.'));
+  }
+
+ function takeOver(caseId) {
+  if (!confirm(`Take over Case ${caseId}?`)) return;
+  fetch(API_URL + '/admin/handle-complaint', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ case_id: caseId })
+  })
+    .then(r => r.json())
+    .then(d => {
+      alert(d.message);
+      loadData(); 
+    })
+    .catch(() => alert('Error taking over case.'));
+}
+
+function reassignCase(caseId) {
+  if (!confirm(`Reassign Case ${caseId} to an available officer?`)) return;
+  fetch(API_URL + '/admin/return-to-officer', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ case_id: caseId })
+  })
+    .then(r => r.json())
+    .then(d => {
+      alert(d.message);
+      loadData(); 
+    })
+    .catch(() => alert('Error reassigning case.'));
+}
+
+
+
+
+function closeManageCase() {
+  document.getElementById('manageCaseModal').classList.add('hidden');
+}
+
+function updateCase() {
+  const caseId = window.currentCaseId;
+  const status = document.getElementById('adminCaseStatus').value;
+  const notes = document.getElementById('adminCaseNotes').value;
+
+  fetch(`${API_URL}/admin/update-case`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      case_id: caseId,
+      new_status: status,
+      officer_id: null, 
+      admin_notes: notes
+    })
+  })
+    .then(r => r.json())
+    .then(d => {
+      alert(d.message);
+      closeManageCase();
+      loadData();
+    })
+    .catch(() => alert('Failed to update case.'));
+}
+
+
+
+function saveAdminCaseChanges(caseId) {
+  const updatedData = {
+    case_id: caseId,
+    crime_type: document.getElementById('editCrimeType').value.trim(),
+    description: document.getElementById('editDescription').value.trim(),
+    urgency: document.getElementById('editUrgency').value.trim(),
+    financial_loss: parseFloat(document.getElementById('editLoss').value) || 0,
+    status: document.getElementById('editStatus').value,
+    suspect_info: null 
+  };
+
+  fetch(API_URL + '/admin/update-complaint', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updatedData)
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showAlert(`✅ Case ${caseId} updated successfully by Admin`, 'success', 'Updated');
+        document.querySelector('div[style*="fixed"]').remove(); 
+        loadData(); 
+      } else {
+        showAlert(`⚠️ ${data.message}`, 'error', 'Update Failed');
+      }
+    })
+    .catch(err => {
+      console.error('Error updating complaint:', err);
+      showAlert('Server error while updating complaint.', 'error', 'Server Error');
+    });
+}
+
+
+function openAdminEditCase(caseId) {
+  fetch(API_URL + '/admin/complaint/' + caseId)
+    .then(r => {
+      if (!r.ok) throw new Error("Server error " + r.status);
+      return r.json();
+    })
+    .then(data => {
+      console.log("📦 Admin complaint data:", data); 
+      if (!data || !data.success || !data.complaint) {
+        alert('Case not found or invalid response');
+        return;
+      }
+
+      const c = data.complaint;
+      const sc = getStatusColor(c.status);
+
+      let html = `
+        <div style="max-height: 70vh; overflow-y: auto;">
+          <div style="background: rgba(99,102,241,0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div><strong style="color: #a855f7;">Case ID:</strong> ${c.case_id}</div>
+              <div><strong style="color: #a855f7;">Crime:</strong> 
+                <input id="editCrimeType" value="${c.crime_type}" 
+                       style="width:100%;background:#0f172a;color:white;border:1px solid #475569;padding:4px;border-radius:6px;">
+              </div>
+              <div><strong style="color: #a855f7;">Urgency:</strong> 
+                <input id="editUrgency" value="${c.urgency}" 
+                       style="width:100%;background:#0f172a;color:white;border:1px solid #475569;padding:4px;border-radius:6px;">
+              </div>
+              <div><strong style="color: #a855f7;">Status:</strong>
+                <select id="editStatus" style="width:100%;background:#0f172a;color:white;border:1px solid #475569;padding:6px;border-radius:6px;">
+                  <option value="Pending" ${c.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                  <option value="Under Investigation" ${c.status === 'Under Investigation' ? 'selected' : ''}>Under Investigation</option>
+                  <option value="Closed" ${c.status === 'Closed' ? 'selected' : ''}>Closed</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <h3 style="color:#a855f7;margin:1.5rem 0 0.8rem;">📝 Description</h3>
+          <textarea id="editDescription" 
+            style="width:100%;background:#0f172a;color:white;border:1px solid #475569;border-radius:10px;padding:1rem;min-height:100px;">
+            ${c.description}
+          </textarea>
+
+          <h3 style="color:#a855f7;margin:1.5rem 0 0.8rem;">💰 Financial Loss</h3>
+          <input id="editLoss" value="${c.financial_loss}" type="number" 
+                 style="width:100%;background:#0f172a;color:white;border:1px solid #475569;padding:4px;border-radius:6px;">
+
+          <div style="margin-top:1.5rem;">
+            <button class="btn btn-primary" onclick="saveAdminCaseChanges('${c.case_id}')" style="width:100%;">💾 Save Changes</button>
+          </div>
+        </div>
+      `;
+
+      showModal('Manage Case - ' + c.case_id, html);
+    })
+    .catch(err => {
+      console.error("❌ Error loading details:", err);
+      alert('Error loading case details.');
+    });
+}
+
+
+function showModal(title, content) {
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+  `;
+
+  const box = document.createElement('div');
+  box.style.cssText = `
+    background: #1e293b;
+    color: white;
+    border-radius: 20px;
+    max-width: 700px;
+    width: 90%;
+    padding: 2rem;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  `;
+
+  const header = document.createElement('div');
+  header.style.cssText = `
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(99,102,241,0.3);
+    margin-bottom: 1rem;
+  `;
+  header.innerHTML = `
+    <h2 style="color:#a855f7;margin:0;">${title}</h2>
+    <span style="cursor:pointer;font-size:1.8rem;color:#94a3b8;" 
+      onclick="this.closest('div[style*=fixed]').remove()">×</span>
+  `;
+
+  const body = document.createElement('div');
+  body.innerHTML = content;
+
+  box.appendChild(header);
+  box.appendChild(body);
+  modal.appendChild(box);
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+
+  document.body.appendChild(modal);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybercrime Incident Tracking System (CITS)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0e27; min-height: 100vh; color: #fff; }
+        body::before { content: ''; position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.3) 0%, transparent 50%), radial-gradient(circle at 40% 20%, rgba(168, 85, 247, 0.2) 0%, transparent 50%); animation: float 20s ease-in-out infinite; z-index: -1; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        nav { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); padding: 1.5rem 3rem; border-bottom: 1px solid rgba(99, 102, 241, 0.2); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #667eea 0%, #a855f7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .nav-links { display: flex; gap: 3rem; list-style: none; }
+        .nav-links a { text-decoration: none; color: #cbd5e1; font-weight: 600; transition: all 0.3s; cursor: pointer; }
+        .nav-links a:hover { color: #fff; }
+        .btn { padding: 0.8rem 2rem; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; transition: all 0.3s; font-size: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6); }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .container { max-width: 1400px; margin: 3rem auto; padding: 0 2rem; }
+        .hero { background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%); backdrop-filter: blur(20px); border-radius: 30px; padding: 4rem; text-align: center; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); margin-bottom: 3rem; border: 1px solid rgba(99, 102, 241, 0.2); }
+        .hero h1 { font-size: 3.5rem; font-weight: 900; background: linear-gradient(135deg, #fff 0%, #a855f7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1.5rem; }
+        .hero p { color: #94a3b8; font-size: 1.3rem; margin-bottom: 3rem; line-height: 1.8; }
+        .login-options { display: flex; gap: 2rem; justify-content: center; }
+        .card { background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%); backdrop-filter: blur(20px); border-radius: 25px; padding: 3rem; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4); margin-bottom: 3rem; border: 1px solid rgba(99, 102, 241, 0.2); }
+        .card h2 { color: #fff; margin-bottom: 2rem; font-size: 2rem; font-weight: 800; border-bottom: 3px solid; border-image: linear-gradient(90deg, #667eea, #a855f7) 1; padding-bottom: 1rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; margin-bottom: 3rem; }
+        .stat-card { background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%); padding: 2.5rem; border-radius: 25px; text-align: center; border: 1px solid rgba(99, 102, 241, 0.3); transition: all 0.3s; }
+        .stat-card:hover { transform: translateY(-10px) scale(1.05); box-shadow: 0 20px 50px rgba(99, 102, 241, 0.4); }
+        .stat-card h3 { font-size: 3rem; margin-bottom: 0.5rem; font-weight: 900; }
+        .stat-card p { opacity: 0.9; font-size: 1.1rem; font-weight: 600; }
+        .hidden { display: none !important; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: #e2e8f0; font-weight: 600; font-size: 0.95rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.9rem 1.2rem; border: 2px solid rgba(99, 102, 241, 0.3); border-radius: 12px; font-size: 1rem; background: rgba(15, 23, 42, 0.6); color: #fff; font-family: inherit; }
+        .form-group input::placeholder { color: #64748b; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); background: rgba(15, 23, 42, 0.9); }
+        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #667eea; }
+        .alert-container { position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px; }
+        .alert { background: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%); border-radius: 15px; padding: 1.2rem 1.5rem; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); border-left: 4px solid; display: flex; align-items: center; gap: 1rem; animation: slideIn 0.3s ease-out; cursor: pointer; margin-bottom: 1rem; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .alert-success { border-left-color: #10b981; }
+        .alert-error { border-left-color: #ef4444; }
+        .alert-info { border-left-color: #3b82f6; }
+        .alert-icon { font-size: 1.5rem; }
+        .alert-content { flex: 1; }
+        .alert-title { font-weight: 700; margin-bottom: 0.3rem; color: #fff; }
+        .alert-message { color: #cbd5e1; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="alert-container" id="alertContainer"></div>
+    <nav>
+        <div class="logo">🔒 CITS</div>
+        <ul class="nav-links">
+            <li><a onclick="showPage('home')">Home</a></li>
+            <li><a onclick="showPage('about')">About</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        
+        <div id="homePage" class="page">
+            <div class="hero">
+                <h1>🛡️ Cybercrime Incident Tracking System</h1>
+                <p>A centralized platform for reporting, tracking, and managing cybercrime incidents.</p>
+                <div class="login-options">
+                    <button class="btn btn-primary" onclick="showPage('citizenLogin')">👤 Citizen Login</button>
+                    <button class="btn btn-primary" onclick="showPage('officerLogin')">👮 Officer Login</button>
+                    <button class="btn btn-primary" onclick="window.open('admin.html', '_blank')">🔐 Admin Login</button>
+                </div>
+            </div>
+            <div class="card">
+                <h2>System Features</h2>
+                <div class="stats-grid">
+                    <div class="stat-card"><h3>📝</h3><p>Online Complaint Filing</p></div>
+                    <div class="stat-card"><h3>📊</h3><p>Real-time Tracking</p></div>
+                    <div class="stat-card"><h3>🔍</h3><p>Evidence Management</p></div>
+                    <div class="stat-card"><h3>📈</h3><p>Crime Analytics</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="aboutPage" class="page hidden">
+            <div class="card">
+                <h2>About CITS</h2>
+                <p style="line-height: 2; color: #cbd5e1; font-size: 1.1rem;">The Cybercrime Incident Tracking System (CITS) addresses the critical issue of fragmented and inefficient cybercrime reporting and management.</p>
+                <h3 style="margin-top: 2rem; color: #a855f7; font-size: 1.5rem;">Key Objectives</h3>
+                <ul style="line-height: 2.5; color: #94a3b8; margin-left: 2rem; margin-top: 1rem; font-size: 1.1rem;">
+                    <li>Centralized complaint filing and tracking</li>
+                    <li>Comprehensive case management</li>
+                    <li>Advanced analytics and monitoring</li>
+                    <li>Role-based security and access control</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="citizenLoginPage" class="page hidden">
+            <div class="card" style="max-width: 500px; margin: 2rem auto;">
+                <h2>👤 Citizen Login</h2>
+                <p style="color: #94a3b8; margin-bottom: 2rem;">Sign in to file complaints and track your cases</p>
+                <form onsubmit="handleCitizenLogin(event)">
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="citizenEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <input type="password" id="citizenPassword" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Login</button>
+                    <button type="button" class="btn" onclick="showPage('home')" style="width: 100%; background: rgba(99, 102, 241, 0.2);">Back to Home</button>
+                </form>
+                <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(99, 102, 241, 0.2);">
+                    <p style="color: #94a3b8;">Don't have an account? <a href="#" onclick="showPage('citizenRegister')" style="color: #a855f7; text-decoration: none; font-weight: 600;">Register here</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="citizenRegisterPage" class="page hidden">
+            <div class="card" style="max-width: 600px; margin: 2rem auto;">
+                <h2>📝 Citizen Registration</h2>
+                <form onsubmit="handleCitizenRegister(event)">
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" id="regName" placeholder="Enter your full name" required minlength="3">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="regEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" id="regPhone" placeholder="10-digit number" required pattern="[0-9]{10}" maxlength="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Address *</label>
+                        <input type="text" id="regAddress" placeholder="Enter your address" required>
+                    </div>
+                    <div class="form-group">
+                        <label>City *</label>
+                        <input type="text" id="regCity" placeholder="Enter your city" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <input type="password" id="regPassword" placeholder="Create password" required minlength="8" oninput="checkPasswordStrength()">
+                        <div style="margin-top: 0.5rem; height: 4px; background: rgba(99, 102, 241, 0.2); border-radius: 2px;">
+                            <div id="strengthBar" style="height: 100%; width: 0%; transition: all 0.3s;"></div>
+                        </div>
+                        <small id="strengthText" style="color: #64748b; font-size: 0.85rem;">Password strength: -</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password *</label>
+                        <input type="password" id="regConfirmPassword" placeholder="Re-enter password" required minlength="8">
+                    </div>
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: flex; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="agreeTerms" required>
+                            <span style="color: #cbd5e1; font-size: 0.9rem;">I agree to the Terms & Conditions</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Create Account</button>
+                    <button type="button" class="btn" onclick="showPage('citizenLogin')" style="width: 100%; background: rgba(99, 102, 241, 0.2);">Back to Login</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="citizenDashboardPage" class="page hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="margin-bottom: 0.5rem;">👤 Citizen Dashboard</h2>
+                        <p style="color: #94a3b8;">Welcome, <strong style="color: #a855f7;" id="citizenDisplayName"></strong></p>
+                        <p style="color: #64748b; font-size: 0.9rem;" id="citizenDisplayEmail"></p>
+                    </div>
+                    <button class="btn btn-primary" onclick="citizenLogout()">🚪 Logout</button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><h3 id="totalComplaints">0</h3><p>Total Complaints</p></div>
+                <div class="stat-card"><h3 id="pendingComplaints">0</h3><p>Pending</p></div>
+                <div class="stat-card"><h3 id="investigatingComplaints">0</h3><p>Investigating</p></div>
+                <div class="stat-card"><h3 id="closedComplaints">0</h3><p>Closed</p></div>
+            </div>
+            <div class="card" style="text-align: center;">
+                <button class="btn btn-primary" onclick="showComplaintFormWithInfo()">➕ File New Complaint</button>
+            </div>
+            <div id="complaintFormCard" class="card hidden">
+                <h2>📝 File New Complaint</h2>
+                <form onsubmit="handleFileComplaint(event)">
+                    <h3 style="color: #a855f7; margin-bottom: 1rem;">👤 Your Details</h3>
+                    <div class="form-group">
+                        <label>Name *</label>
+                        <input type="text" id="complaintName" readonly style="background: rgba(99, 102, 241, 0.1);">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Contact *</label>
+                            <input type="tel" id="complaintContact" readonly style="background: rgba(99, 102, 241, 0.1);">
+                        </div>
+                        <div class="form-group">
+                            <label>City *</label>
+                            <input type="text" id="complaintCity" readonly style="background: rgba(99, 102, 241, 0.1);">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Address *</label>
+                        <input type="text" id="complaintAddress" readonly style="background: rgba(99, 102, 241, 0.1);">
+                    </div>
+
+                    <h3 style="color: #a855f7; margin: 2rem 0 1rem;">🚨 Incident Details</h3>
+                    <div class="form-group">
+                        <label>Crime Type *</label>
+                        <select id="complaintCrimeType" required>
+                            <option value="">Select Crime Type</option>
+                            <option value="Phishing">Phishing</option>
+                            <option value="Identity Theft">Identity Theft</option>
+                            <option value="Online Fraud">Online Fraud</option>
+                            <option value="Cyberbullying">Cyberbullying</option>
+                            <option value="Hacking">Hacking</option>
+                            <option value="Ransomware">Ransomware</option>
+                            <option value="Data Breach">Data Breach</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Date *</label>
+                            <input type="date" id="complaintDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Time</label>
+                            <input type="time" id="complaintTime">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description * (min 50 chars)</label>
+                        <textarea id="complaintDescription" required minlength="50" style="min-height: 150px;" placeholder="Describe the incident..."></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Financial Loss (₹)</label>
+                            <input type="number" id="complaintFinancialLoss" min="0" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Urgency *</label>
+                            <select id="complaintUrgency" required>
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Suspect Info (optional)</label>
+                        <textarea id="complaintSuspectInfo" style="min-height: 100px;" placeholder="Any suspect details..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Upload Evidence</label>
+                        <input type="file" id="complaintEvidence" multiple accept="image/*,.pdf,.doc,.docx">
+                        <div id="filePreview" style="margin-top: 1rem;"></div>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">✅ Submit</button>
+                        <button type="button" class="btn" onclick="hideComplaintForm()" style="flex: 1; background: rgba(99, 102, 241, 0.2);">❌ Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>📋 My Complaints</h2>
+                <div id="complaintsContainer">
+                    <p style="color: #94a3b8; text-align: center; padding: 3rem;">No complaints yet. File your first complaint!</p>
+                </div>
+            </div>
+            <div id="caseHistorySection" class="card hidden" style="margin-top:20px;">
+            <h3>📜 Case History</h3>
+            <ul id="caseHistoryList" style="max-height:200px;overflow-y:auto;padding-left:20px;"></ul>
+</div>
+
+        </div>
+<div id="officerLoginPage" class="page hidden">
+    <div class="card" style="max-width: 500px; margin: 2rem auto;">
+        <h2>👮 Officer Login</h2>
+        <p style="color: #94a3b8; margin-bottom: 2rem;">Sign in to manage cases and investigations</p>
+        <form onsubmit="handleOfficerLogin(event)">
+            <div class="form-group">
+                <label>Email Address *</label>
+                <input type="email" id="officerEmail" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label>Password *</label>
+                <input type="password" id="officerPassword" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Login</button>
+            <button type="button" class="btn" onclick="showPage('home')" style="width: 100%; background: rgba(99, 102, 241, 0.2);">Back to Home</button>
+        </form>
+        <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(99, 102, 241, 0.2);">
+            <p style="color: #64748b; font-size: 0.85rem;">Demo: officer@cits.com / officer123</p>
+        </div>
+    </div>
+</div>
+<div id="officerDashboardPage" class="page hidden">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 style="margin-bottom: 0.5rem;">👮 Officer Dashboard</h2>
+                <p style="color: #94a3b8;">Welcome, <strong style="color: #a855f7;" id="officerDisplayName"></strong></p>
+                <p style="color: #64748b; font-size: 0.9rem;">Badge: <span id="officerBadge"></span> | Department: <span id="officerDept"></span></p>
+            </div>
+            <button class="btn btn-primary" onclick="officerLogout()">🚪 Logout</button>
+        </div>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card"><h3 id="officerTotalCases">-</h3><p>Total Cases</p></div>
+        <div class="stat-card"><h3 id="officerPendingCases">-</h3><p>Pending</p></div>
+        <div class="stat-card"><h3 id="officerInvestigatingCases">-</h3><p>Investigating</p></div>
+        <div class="stat-card"><h3 id="officerClosedCases">-</h3><p>Closed</p></div>
+    </div>
+
+    <div class="card">
+        <h2>📋 Assigned Cases</h2>
+        <div id="officerCasesContainer">
+            <p style="color: #94a3b8; text-align: center; padding: 3rem;">Loading cases...</p>
+        </div>
+    </div>
+</div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        function showAlert(msg, type, title) {
+            type = type || 'info';
+            var c = document.getElementById('alertContainer');
+            var icons = {success: '✅', error: '❌', info: 'ℹ️'};
+            var titles = {success: title || 'Success', error: title || 'Error', info: title || 'Info'};
+            var a = document.createElement('div');
+            a.className = 'alert alert-' + type;
+            a.innerHTML = '<div class="alert-icon">' + icons[type] + '</div><div class="alert-content"><div class="alert-title">' + titles[type] + '</div><div class="alert-message">' + msg + '</div></div>';
+            c.appendChild(a);
+            a.onclick = function() { a.remove(); };
+            setTimeout(function() { a.remove(); }, 5000);
+        }
+
+        var registeredCitizens = [{id: 'CIT001', name: 'Demo Citizen', email: 'citizen@gmail.com', password: 'citizen123', phone: '9876543210', address: '123 Main St', city: 'Mumbai'}];
+        var currentCitizen = null;
+        var complaints = [];
+
+        function showPage(p) {
+            var pages = document.querySelectorAll('.page');
+            for (var i = 0; i < pages.length; i++) pages[i].classList.add('hidden');
+            document.getElementById(p + 'Page').classList.remove('hidden');
+        }
+
+        function checkPasswordStrength() {
+            var pwd = document.getElementById('regPassword').value;
+            var bar = document.getElementById('strengthBar');
+            var txt = document.getElementById('strengthText');
+            var s = 0;
+            if (pwd.length >= 8) s++;
+            if (pwd.length >= 12) s++;
+            if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) s++;
+            if (/\d/.test(pwd)) s++;
+            if (/[^a-zA-Z0-9]/.test(pwd)) s++;
+            if (s === 0) { bar.style.width = '0%'; txt.textContent = 'Password strength: -'; }
+            else if (s <= 2) { bar.style.width = '33%'; bar.style.background = '#ef4444'; txt.textContent = 'Weak'; txt.style.color = '#ef4444'; }
+            else if (s <= 3) { bar.style.width = '66%'; bar.style.background = '#f59e0b'; txt.textContent = 'Medium'; txt.style.color = '#f59e0b'; }
+            else { bar.style.width = '100%'; bar.style.background = '#10b981'; txt.textContent = 'Strong'; txt.style.color = '#10b981'; }
+        }
+    function loadCaseHistory(caseId) {
+        fetch(`${API_URL}/case-history/${caseId}`)
+        .then(r => r.json())
+        .then(d => {
+        if (d.success && d.history.length > 0) {
+            let html = '';
+            d.history.forEach(h => {
+            html += `
+            <li>
+              <strong>${h.timestamp}</strong> — 
+              ${h.changed_by} ${h.action_type.toLowerCase()} case from 
+              ${h.previous_officer || 'System'} to 
+              ${h.new_officer || 'Unassigned'}
+            </li>`;
+        });
+        document.getElementById('caseHistoryList').innerHTML = html;
+        document.getElementById('caseHistorySection').classList.remove('hidden');
+      } else {
+        document.getElementById('caseHistorySection').classList.add('hidden');
+      }
+    });
+}
+
+    function handleCitizenLogin(e) {
+    e.preventDefault();
+    var email = document.getElementById('citizenEmail').value.trim();
+    var pwd = document.getElementById('citizenPassword').value;
+    
+    fetch(API_URL + '/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email: email, password: pwd})
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.success) {
+            currentCitizen = data.citizen;
+            showAlert('Welcome back, ' + data.citizen.full_name + '!', 'success');
+            setTimeout(function() { loadCitizenDashboard(); }, 1000);
+        } else {
+            showAlert(data.message, 'error');
+        }
+    })
+    .catch(function(err) {
+        showAlert('Server connection error. Make sure backend is running!', 'error');
+        console.error(err);
+    });
+}
+
+    function handleCitizenRegister(e) {
+    e.preventDefault();
+    var pwd = document.getElementById('regPassword').value;
+    var cpwd = document.getElementById('regConfirmPassword').value;
+    if (pwd !== cpwd) { showAlert('Passwords do not match', 'error'); return; }
+    
+    fetch(API_URL + '/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            name: document.getElementById('regName').value.trim(),
+            email: document.getElementById('regEmail').value.trim(),
+            password: pwd,
+            phone: document.getElementById('regPhone').value.trim(),
+            address: document.getElementById('regAddress').value.trim(),
+            city: document.getElementById('regCity').value.trim()
+        })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.success) {
+            showAlert('Account created! ID: ' + data.citizen_id + 'success');
+            setTimeout(function() {
+                showPage('citizenLogin');
+                document.getElementById('citizenEmail').value = document.getElementById('regEmail').value;
+            }, 2000);
+        } else {
+            showAlert(data.message, 'error');
+        }
+    })
+    .catch(function(err) {
+        showAlert('Server connection error. Make sure backend is running!', 'error');
+    });
+}
+
+    function loadCitizenDashboard() {
+    if (!currentCitizen) return;
+    document.getElementById('citizenDisplayName').textContent = currentCitizen.full_name;
+    document.getElementById('citizenDisplayEmail').textContent = currentCitizen.email;
+    
+    
+    fetch(API_URL + '/dashboard/' + currentCitizen.citizen_id)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                document.getElementById('totalComplaints').textContent = data.stats.total || 0;
+                document.getElementById('pendingComplaints').textContent = data.stats.pending || 0;
+                document.getElementById('investigatingComplaints').textContent = data.stats.investigating || 0;
+                document.getElementById('closedComplaints').textContent = data.stats.closed || 0;
+            }
+        })
+        .catch(function(err) {
+            console.error('Stats error:', err);
+        });
+    
+    fetch(API_URL + '/complaints/' + currentCitizen.citizen_id)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                displayComplaintsFromDB(data.complaints);
+            }
+        })
+        .catch(function(err) {
+            console.error('Complaints error:', err);
+            document.getElementById('complaintsContainer').innerHTML = '<p style="color: #ef4444; text-align: center; padding: 3rem;">Error loading complaints</p>';
+        });
+    
+    showPage('citizenDashboard');
+}
+
+        function citizenLogout() {
+            if (confirm('Logout?')) { currentCitizen = null; showAlert('Logged out', 'success'); showPage('home'); }
+        }
+
+        function showComplaintForm() {
+            document.getElementById('complaintName').value = currentCitizen.name;
+            document.getElementById('complaintContact').value = currentCitizen.phone;
+            document.getElementById('complaintAddress').value = currentCitizen.address;
+            document.getElementById('complaintCity').value = currentCitizen.city;
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('complaintDate').setAttribute('max', today);
+            document.getElementById('complaintFormCard').classList.remove('hidden');
+        }
+
+        function showComplaintFormWithInfo() {
+    fetch(API_URL + '/available-officers')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                var availableOfficers = data.available_officers;
+                
+                if (availableOfficers === 0) {
+                    if (!confirm('⚠️ All officers are currently handling 5 cases (maximum).\n\nYour complaint will be filed but may take longer to be assigned.\n\nContinue filing complaint?')) {
+                        return;
+                    }
+                }
+                
+                showComplaintForm();
+               
+                var formCard = document.getElementById('complaintFormCard');
+                var existingBanner = formCard.querySelector('.officer-info-banner');
+                if (existingBanner) existingBanner.remove();
+                
+                var banner = document.createElement('div');
+                banner.className = 'officer-info-banner';
+                banner.style.cssText = 'background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;';
+                
+                if (availableOfficers > 0) {
+                    banner.innerHTML = '<div style="display: flex; align-items: center; gap: 0.5rem;"><span style="font-size: 1.2rem;">ℹ️</span><div><strong style="color: #60a5fa;">Auto-Assignment Active</strong><br><small style="color: #cbd5e1;">' + availableOfficers + ' officer(s) available. Your case will be automatically assigned!</small></div></div>';
+                } else {
+                    banner.style.background = 'rgba(251, 191, 36, 0.2)';
+                    banner.style.borderColor = 'rgba(251, 191, 36, 0.4)';
+                    banner.innerHTML = '<div style="display: flex; align-items: center; gap: 0.5rem;"><span style="font-size: 1.2rem;">⚠️</span><div><strong style="color: #fbbf24;">High Workload</strong><br><small style="color: #cbd5e1;">All officers at capacity (5 cases each). Your case will be queued.</small></div></div>';
+                }
+                
+                var form = formCard.querySelector('form');
+                formCard.insertBefore(banner, form);
+            } else {
+                
+                showComplaintForm();
+            }
+        })
+        .catch(function(err) {
+            console.error('Error checking officers:', err);
+            showComplaintForm(); 
+        });
+}
+function viewOfficerWorkload() {
+    fetch(API_URL + '/officer-workload')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                var html = '<div style="max-height: 70vh; overflow-y: auto;">';
+                html += '<table style="width: 100%; border-collapse: collapse;">';
+                html += '<thead><tr style="background: rgba(99, 102, 241, 0.2);">';
+                html += '<th style="padding: 1rem; text-align: left;">Officer</th>';
+                html += '<th style="padding: 1rem; text-align: center;">Badge</th>';
+                html += '<th style="padding: 1rem; text-align: center;">Assigned</th>';
+                html += '<th style="padding: 1rem; text-align: center;">Pending</th>';
+                html += '<th style="padding: 1rem; text-align: center;">Investigating</th>';
+                html += '<th style="padding: 1rem; text-align: center;">Closed</th>';
+                html += '<th style="padding: 1rem; text-align: center;">Status</th>';
+                html += '</tr></thead><tbody>';
+                
+                for (var i = 0; i < data.workload.length; i++) {
+                    var w = data.workload[i];
+                    var statusColor = w.workload_status === 'AVAILABLE' ? '#10b981' : w.workload_status === 'BUSY' ? '#f59e0b' : '#ef4444';
+                    
+                    html += '<tr style="border-bottom: 1px solid rgba(99, 102, 241, 0.1);">';
+                    html += '<td style="padding: 1rem;"><strong>' + w.full_name + '</strong><br><small style="color: #64748b;">' + w.department + '</small></td>';
+                    html += '<td style="padding: 1rem; text-align: center;">' + w.badge_number + '</td>';
+                    html += '<td style="padding: 1rem; text-align: center;"><strong style="font-size: 1.2rem; color: #a855f7;">' + w.assigned_cases + '/5</strong></td>';
+                    html += '<td style="padding: 1rem; text-align: center;">' + w.pending_cases + '</td>';
+                    html += '<td style="padding: 1rem; text-align: center;">' + w.investigating_cases + '</td>';
+                    html += '<td style="padding: 1rem; text-align: center;">' + w.closed_cases + '</td>';
+                    html += '<td style="padding: 1rem; text-align: center;"><span style="padding: 0.4rem 0.8rem; border-radius: 15px; font-size: 0.85rem; font-weight: 700; background: ' + statusColor + '20; color: ' + statusColor + ';">' + w.workload_status + '</span></td>';
+                    html += '</tr>';
+                }
+                
+                html += '</tbody></table></div>';
+                showModal('👮 Officer Workload Distribution', html);
+            }
+        })
+        .catch(function(err) {
+            showAlert('Error loading workload data', 'error');
+        });
+}
+
+        function hideComplaintForm() {
+            document.getElementById('complaintFormCard').classList.add('hidden');
+            document.getElementById('filePreview').innerHTML = '';
+        }
+
+        function handleFileComplaint(e) {
+    e.preventDefault();
+    var desc = document.getElementById('complaintDescription').value.trim();
+    if (desc.length < 50) { showAlert('Description too short (min 50 chars)', 'error'); return; }
+    
+    var files = document.getElementById('complaintEvidence').files;
+    var evidence = [];
+    for (var i = 0; i < files.length; i++) {
+        evidence.push({
+            name: files[i].name,
+            type: files[i].type
+        });
+    }
+    
+    fetch(API_URL + '/file-complaint', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            citizen_id: currentCitizen.citizen_id,
+            crime_type: document.getElementById('complaintCrimeType').value,
+            incident_date: document.getElementById('complaintDate').value,
+            incident_time: document.getElementById('complaintTime').value || null,
+            description: desc,
+            financial_loss: document.getElementById('complaintFinancialLoss').value || 0,
+            urgency: document.getElementById('complaintUrgency').value,
+            suspect_info: document.getElementById('complaintSuspectInfo').value.trim() || null,
+            evidence: evidence
+        })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.success) {
+            showAlert('Complaint filed! Case ID: ' + data.case_id + 'success');
+            hideComplaintForm();
+            loadCitizenDashboard();
+        } else {
+            showAlert(data.message, 'error');
+        }
+    })
+    .catch(function(err) {
+        showAlert('Error filing complaint', 'error');
+    });
+}
+
+        function displayComplaints(cs) {
+            var con = document.getElementById('complaintsContainer');
+            if (cs.length === 0) { con.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 3rem;">No complaints yet</p>'; return; }
+            var html = '<table style="width: 100%; border-collapse: separate; border-spacing: 0 1rem;"><thead><tr>';
+            html += '<th style="padding: 1rem; text-align: left; color: #fff;">Case ID</th>';
+            html += '<th style="padding: 1rem; text-align: left; color: #fff;">Crime Type</th>';
+            html += '<th style="padding: 1rem; text-align: left; color: #fff;">Date</th>';
+            html += '<th style="padding: 1rem; text-align: left; color: #fff;">Status</th>';
+            html += '<th style="padding: 1rem; text-align: left; color: #fff;">Officer</th>';
+            html += '<th style="padding: 1rem; text-align: left; color: #fff;">Actions</th>';
+            html += '</tr></thead><tbody>';
+            for (var i = 0; i < cs.length; i++) {
+                var c = cs[i];
+                var sc = getStatusColor(c.status);
+                html += '<tr style="background: rgba(15, 23, 42, 0.6);">';
+                html += '<td style="padding: 1rem; border: 1px solid rgba(99, 102, 241, 0.1); border-radius: 15px 0 0 15px;"><strong style="color: #a855f7;">' + c.caseId + '</strong></td>';
+                html += '<td style="padding: 1rem; border-top: 1px solid rgba(99, 102, 241, 0.1); border-bottom: 1px solid rgba(99, 102, 241, 0.1);">' + c.crimeType + '</td>';
+                html += '<td style="padding: 1rem; border-top: 1px solid rgba(99, 102, 241, 0.1); border-bottom: 1px solid rgba(99, 102, 241, 0.1);">' + new Date(c.filedDate).toLocaleDateString() + '</td>';
+                html += '<td style="padding: 1rem; border-top: 1px solid rgba(99, 102, 241, 0.1); border-bottom: 1px solid rgba(99, 102, 241, 0.1);"><span style="padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; background: ' + sc + ';">' + c.status + '</span></td>';
+                html += '<td style="padding: 1rem; border-top: 1px solid rgba(99, 102, 241, 0.1); border-bottom: 1px solid rgba(99, 102, 241, 0.1);">' + c.assignedOfficer + '</td>';
+                html += '<td style="padding: 1rem; border: 1px solid rgba(99, 102, 241, 0.1); border-radius: 0 15px 15px 0;"><button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="viewDetails(\'' + c.caseId + '\')">👁️ View</button></td>';
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            con.innerHTML = html;
+        }
+
+    function displayComplaintsFromDB(complaints) {
+    var con = document.getElementById('complaintsContainer');
+    if (complaints.length === 0) {
+        con.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 3rem;">No complaints yet. File your first complaint!</p>';
+        return;
+    }
+    
+    var html = '<table style="width: 100%; border-collapse: separate; border-spacing: 0 1rem;"><thead><tr>';
+    html += '<th style="padding: 1rem; text-align: left; color: #fff;">Case ID</th>';
+    html += '<th style="padding: 1rem; text-align: left; color: #fff;">Crime Type</th>';
+    html += '<th style="padding: 1rem; text-align: left; color: #fff;">Status</th>';
+    html += '<th style="padding: 1rem; text-align: left; color: #fff;">Assigned To</th>';
+    html += '<th style="padding: 1rem; text-align: left; color: #fff;">Filed Date</th>';
+    html += '<th style="padding: 1rem; text-align: left; color: #fff;">Actions</th>';
+    html += '</tr></thead><tbody>';
+    
+    for (var i = 0; i < complaints.length; i++) {
+        var c = complaints[i];
+        var sc = getStatusColor(c.status);
+        html += '<tr style="background: rgba(15, 23, 42, 0.6);">';
+        html += '<td style="padding: 1rem;"><strong style="color: #a855f7;">' + c.case_id + '</strong></td>';
+        html += '<td style="padding: 1rem;">' + c.crime_type + '</td>';
+        html += '<td style="padding: 1rem;"><span style="padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; background: ' + sc + ';">' + c.status + '</span></td>';
+        
+        
+       if (c.handled_by_admin === 1) {
+            html += '<td style="padding: 1rem;"><span style="color: #38bdf8;">🧑‍💼 Handled by Admin</span></td>';}
+        else if (c.officer_name) {
+        html += '<td style="padding: 1rem;">👮 ' + c.officer_name + '</td>';
+        } else {
+    html += '<td style="padding: 1rem;"><span style="color: #f59e0b;">⏳ Awaiting Officer Assignment</span></td>';
+}
+
+
+        
+        html += '<td style="padding: 1rem;">' + new Date(c.filed_date).toLocaleDateString() + '</td>';
+        html += '<td style="padding: 1rem;"><button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="viewDetailsFromDB(\'' + c.case_id + '\')">👁️ View</button></td>';
+        html += '</tr>';
+    }
+    html += '</tbody></table>';
+    con.innerHTML = html;
+}
+
+
+function viewDetailsFromDB(caseId) {
+    fetch(API_URL + '/complaint/' + caseId)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const c = data.complaint;
+                const sc = getStatusColor(c.status);
+                let html = '<div style="max-height: 75vh; overflow-y: auto;">';
+
+                html += `
+                    <div style="background: rgba(99,102,241,0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div><strong style="color: #a855f7;">Case ID:</strong> ${c.case_id}</div>
+                            <div><strong style="color: #a855f7;">Status:</strong> 
+                                <span style="padding: 0.3rem 0.8rem; border-radius: 15px; background: ${sc}; color: #fff;">${c.status}</span>
+                            </div>
+                            <div><strong style="color: #a855f7;">Crime:</strong> ${c.crime_type}</div>
+                            <div><strong style="color: #a855f7;">Urgency:</strong> ${c.urgency}</div>
+                            <div><strong style="color: #a855f7;">Date Filed:</strong> ${new Date(c.filed_date).toLocaleString()}</div>
+                            <div><strong style="color: #a855f7;">Loss:</strong> ₹${c.financial_loss}</div>
+                        </div>
+                    </div>
+                `;
+
+                html += `<h3 style="color:#a855f7;margin:1.5rem 0 0.8rem;">👮 Assigned To</h3>`;
+                html += `<div style="background:rgba(99,102,241,0.1);padding:1.5rem;border-radius:15px;margin-bottom:1.5rem;">`;
+                
+                if (parseInt(c.handled_by_admin) === 1) {
+                    html += `
+                        <div style="text-align:center;">
+                            <strong style="color:#38bdf8;font-size:1.1rem;">🧑‍💼 Currently Handled by Admin</strong>
+                            <p style="color:#94a3b8;">Your case is under administrative review.</p>
+                        </div>`;}
+                else if (c.officer_name) {
+                    html += `
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                            <div><strong>👤 Name:</strong> ${c.officer_name}</div>
+                            <div><strong>🎖️ Badge:</strong> ${c.officer_badge}</div>
+                            <div><strong>🏢 Department:</strong> ${c.officer_department}</div>
+                            <div><strong>📞 Contact:</strong> ${c.officer_phone}</div>
+                        </div>
+                        <div style="margin-top:1rem;padding:0.8rem;background:rgba(16,185,129,0.2);border-radius:10px;border-left:4px solid #10b981;">
+                            <strong style="color:#10b981;">✅ Your case is being handled by Officer ${c.officer_name}</strong>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div style="text-align:center;padding:2rem;">
+                            <div style="font-size:3rem;margin-bottom:1rem;">⏳</div>
+                            <strong style="color:#f59e0b;font-size:1.1rem;">Awaiting Officer Assignment</strong>
+                            <p style="color:#94a3b8;margin-top:0.5rem;">Your case will be assigned soon.</p>
+                        </div>
+                    `;
+                }
+
+                html += `</div>`;
+
+                
+                if (data.history && data.history.length > 0) {
+                    html += `<h3 style="color:#a855f7;margin:1.5rem 0 0.8rem;">📜 Case History</h3>`;
+                    html += `<ul style="background:rgba(99,102,241,0.1);padding:1rem 1.5rem;border-radius:15px;list-style:none;">`;
+                    
+                    data.history.forEach(h => {
+                        const actionLabel = {
+                            'ASSIGNED': '🧾 Assigned to Officer',
+                            'TAKEN_OVER': '🧑‍💼 Taken Over by Admin',
+                            'RETURNED': '📤 Returned to Officer',
+                            'REASSIGNED': '🔄 Reassigned to Officer',
+                            'CLOSED': '✅ Case Closed'
+                        }[h.action_type] || h.action_type;
+
+                        html += `
+                            <li style="padding:0.6rem 0;border-bottom:1px solid rgba(99,102,241,0.2);">
+                                <div><strong>${actionLabel}</strong> – ${h.changed_by}</div>
+                                <div style="color:#94a3b8;">${new Date(h.timestamp).toLocaleString()}</div>
+                                <div style="color:#cbd5e1;font-size:0.9rem;">From: ${h.previous_officer || 'None'} → To: ${h.new_officer || 'None'}</div>
+                            </li>
+                        `;
+                    });
+                    html += `</ul>`;
+                }
+                html += `
+                    <h3 style="color:#a855f7;margin:1.5rem 0 0.8rem;">📝 Incident Description</h3>
+                    <div style="background:rgba(99,102,241,0.1);padding:1.5rem;border-radius:15px;margin-bottom:1.5rem;line-height:1.6;">
+                        ${c.description}
+                    </div>
+                `;
+                if (c.suspect_info) {
+                    html += `
+                        <h3 style="color:#a855f7;margin:1.5rem 0 0.8rem;">🔍 Suspect Information</h3>
+                        <div style="background:rgba(99,102,241,0.1);padding:1.5rem;border-radius:15px;margin-bottom:1.5rem;">
+                            ${c.suspect_info}
+                        </div>
+                    `;
+                }
+
+                html += '</div>';
+                showModal('Case Details - ' + c.case_id, html);
+            } else {
+                showAlert('Complaint not found', 'error');
+            }
+        })
+        .catch(err => {
+            console.error('Error loading details:', err);
+            showAlert('Error loading details', 'error');
+        });
+}
+
+
+        function getStatusColor(s) {
+            if (s === 'Pending') return 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)';
+            if (s === 'Under Investigation') return 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
+            if (s === 'Closed') return 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            return 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)';
+        }
+
+        function viewDetails(cid) {
+            var c = null;
+            for (var i = 0; i < complaints.length; i++) {
+                if (complaints[i].caseId === cid) { c = complaints[i]; break; }
+            }
+            if (!c) return;
+            var sc = getStatusColor(c.status);
+            var html = '<div style="max-height: 70vh; overflow-y: auto;">';
+            html += '<div style="background: rgba(99, 102, 241, 0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem; border: 1px solid rgba(99, 102, 241, 0.2);">';
+            html += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">';
+            html += '<div><strong style="color: #a855f7;">Case ID:</strong> ' + c.caseId + '</div>';
+            html += '<div><strong style="color: #a855f7;">Status:</strong> <span style="padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem; font-weight: 700; background: ' + sc + ';">' + c.status + '</span></div>';
+            html += '<div><strong style="color: #a855f7;">Crime:</strong> ' + c.crimeType + '</div>';
+            html += '<div><strong style="color: #a855f7;">Urgency:</strong> ' + c.urgency + '</div>';
+            html += '<div><strong style="color: #a855f7;">Date:</strong> ' + c.incidentDate + '</div>';
+            html += '<div><strong style="color: #a855f7;">Time:</strong> ' + c.incidentTime + '</div>';
+            html += '<div><strong style="color: #a855f7;">Filed:</strong> ' + new Date(c.filedDate).toLocaleString() + '</div>';
+            html += '<div><strong style="color: #a855f7;">Loss:</strong> ' + c.financialLoss + '</div>';
+            html += '</div></div>';
+            html += '<h3 style="color: #a855f7; margin: 1.5rem 0 0.8rem;">Complainant</h3>';
+            html += '<div style="background: rgba(99, 102, 241, 0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem; border: 1px solid rgba(99, 102, 241, 0.2);">';
+            html += '<div><strong>Name:</strong> ' + c.citizenName + '</div>';
+            html += '<div style="margin-top: 0.5rem;"><strong>Contact:</strong> ' + c.contact + '</div>';
+            html += '<div style="margin-top: 0.5rem;"><strong>Email:</strong> ' + c.citizenEmail + '</div>';
+            html += '<div style="margin-top: 0.5rem;"><strong>Address:</strong> ' + c.address + ', ' + c.city + '</div></div>';
+            html += '<h3 style="color: #a855f7; margin: 1.5rem 0 0.8rem;">Description</h3>';
+            html += '<div style="background: rgba(99, 102, 241, 0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem; border: 1px solid rgba(99, 102, 241, 0.2); line-height: 1.6;">' + c.description + '</div>';
+            if (c.suspectInfo !== 'None') {
+                html += '<h3 style="color: #a855f7; margin: 1.5rem 0 0.8rem;">Suspect Info</h3>';
+                html += '<div style="background: rgba(99, 102, 241, 0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem; border: 1px solid rgba(99, 102, 241, 0.2);">' + c.suspectInfo + '</div>';
+            }
+            if (c.evidence.length > 0) {
+                html += '<h3 style="color: #a855f7; margin: 1.5rem 0 0.8rem;">Evidence (' + c.evidence.length + ')</h3>';
+                html += '<div style="background: rgba(99, 102, 241, 0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem; border: 1px solid rgba(99, 102, 241, 0.2);">';
+                for (var i = 0; i < c.evidence.length; i++) {
+                    html += '<div style="padding: 0.5rem 0; color: #cbd5e1;">📎 ' + c.evidence[i].name + ' (' + (c.evidence[i].size / 1024).toFixed(1) + ' KB)</div>';
+                }
+                html += '</div>';
+            }
+            html += '<h3 style="color: #a855f7; margin: 1.5rem 0 0.8rem;">Investigation</h3>';
+            html += '<div style="background: rgba(99, 102, 241, 0.1); padding: 1.5rem; border-radius: 15px; border: 1px solid rgba(99, 102, 241, 0.2);">';
+            html += '<div><strong>Officer:</strong> ' + c.assignedOfficer + '</div>';
+            html += '<div style="margin-top: 0.5rem;"><strong>Updated:</strong> ' + new Date(c.lastUpdated).toLocaleString() + '</div></div></div>';
+            showModal('Case Details - ' + cid, html);
+        }
+
+        function showModal(title, content) {
+            var m = document.createElement('div');
+            m.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+            var mc = document.createElement('div');
+            mc.style.cssText = 'background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%); backdrop-filter: blur(20px); padding: 2rem; border-radius: 25px; max-width: 800px; width: 90%; max-height: 85vh; overflow-y: auto; border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);';
+            var h = document.createElement('div');
+            h.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid rgba(99, 102, 241, 0.3);';
+            h.innerHTML = '<h2 style="color: #fff; margin: 0;">' + title + '</h2><span style="font-size: 2rem; cursor: pointer; color: #94a3b8;" onclick="this.closest(\'div[style*=fixed]\').remove()">×</span>';
+            var b = document.createElement('div');
+            b.innerHTML = content;
+            mc.appendChild(h);
+            mc.appendChild(b);
+            m.appendChild(mc);
+            m.onclick = function(e) { if (e.target === m) m.remove(); };
+            document.body.appendChild(m);
+        }
+
+var currentOfficer = null;
+
+function handleOfficerLogin(e) {
+    e.preventDefault();
+    var email = document.getElementById('officerEmail').value.trim();
+    var pwd = document.getElementById('officerPassword').value;
+    
+    fetch(API_URL + '/officer-login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email: email, password: pwd})
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.success) {
+            currentOfficer = data.officer;
+            showAlert('Welcome, Officer ' + data.officer.full_name + '!', 'success');
+            setTimeout(function() { loadOfficerDashboard(); }, 1000);
+        } else {
+            showAlert(data.message, 'error');
+        }
+    })
+    .catch(function(err) {
+        showAlert('Server connection error!', 'error');
+        console.error(err);
+    });
+}
+
+function loadOfficerDashboard() {
+    if (!currentOfficer) return;
+    
+    document.getElementById('officerDisplayName').textContent = currentOfficer.full_name;
+    document.getElementById('officerBadge').textContent = currentOfficer.badge_number;
+    document.getElementById('officerDept').textContent = currentOfficer.department;
+    
+    fetch(API_URL + '/officer/dashboard/' + currentOfficer.officer_id)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                document.getElementById('officerTotalCases').textContent = data.stats.total || 0;
+                document.getElementById('officerPendingCases').textContent = data.stats.pending || 0;
+                document.getElementById('officerInvestigatingCases').textContent = data.stats.investigating || 0;
+                document.getElementById('officerClosedCases').textContent = data.stats.closed || 0;
+            }
+        });
+    fetch(API_URL + '/officer/cases/' + currentOfficer.officer_id)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                displayOfficerCases(data.cases);
+            }
+        })
+        .catch(function(err) {
+            document.getElementById('officerCasesContainer').innerHTML = '<p style="color: #ef4444; text-align: center; padding: 3rem;">Error loading cases</p>';
+        });
+    
+    showPage('officerDashboard');
+}
+
+function displayOfficerCases(cases) {
+    var con = document.getElementById('officerCasesContainer');
+    if (cases.length === 0) {
+        con.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 3rem;">No cases assigned yet</p>';
+        return;
+    }
+    
+    var html = '<table style="width: 100%; border-collapse: separate; border-spacing: 0 1rem;"><thead><tr>';
+    html += '<th style="padding: 1rem; text-align: left; color: #fff;">Case ID</th>';
+    html += '<th style="padding: 1rem; text-align: left; color: #fff;">Citizen</th>';
+    html += '<th style="padding: 1rem; text-align: left; color: #fff;">Crime Type</th>';
+    html += '<th style="padding: 1rem; text-align: left; color: #fff;">Urgency</th>';
+    html += '<th style="padding: 1rem; text-align: left; color: #fff;">Status</th>';
+    html += '<th style="padding: 1rem; text-align: left; color: #fff;">Actions</th>';
+    html += '</tr></thead><tbody>';
+    
+    for (var i = 0; i < cases.length; i++) {
+        var c = cases[i];
+        var sc = getStatusColor(c.status);
+        var urgencyColor = c.urgency === 'High' ? '#ef4444' : c.urgency === 'Medium' ? '#f59e0b' : '#10b981';
+        
+        html += '<tr style="background: rgba(15, 23, 42, 0.6);">';
+        html += '<td style="padding: 1rem;"><strong style="color: #a855f7;">' + c.case_id + '</strong></td>';
+        html += '<td style="padding: 1rem;">' + c.citizen_name + '</td>';
+        html += '<td style="padding: 1rem;">' + c.crime_type + '</td>';
+        html += '<td style="padding: 1rem;"><span style="color: ' + urgencyColor + '; font-weight: 700;">⚠️ ' + c.urgency + '</span></td>';
+        html += '<td style="padding: 1rem;"><span style="padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700; background: ' + sc + ';">' + c.status + '</span></td>';
+        html += '<td style="padding: 1rem;"><button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="viewOfficerCaseDetails(\'' + c.case_id + '\')">🔍 Manage</button></td>';
+        html += '</tr>';
+    }
+    html += '</tbody></table>';
+    con.innerHTML = html;
+}
+
+function viewOfficerCaseDetails(caseId) {
+    fetch(API_URL + '/complaint/' + caseId)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                var c = data.complaint;
+                var sc = getStatusColor(c.status);
+                
+                var html = '<div style="max-height: 70vh; overflow-y: auto;">';
+                html += '<div style="background: rgba(99, 102, 241, 0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem;">';
+                html += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">';
+                html += '<div><strong style="color: #a855f7;">Case ID:</strong> ' + c.case_id + '</div>';
+                html += '<div><strong style="color: #a855f7;">Current Status:</strong> <span style="padding: 0.3rem 0.8rem; border-radius: 15px; background: ' + sc + ';">' + c.status + '</span></div>';
+                html += '<div><strong style="color: #a855f7;">Crime:</strong> ' + c.crime_type + '</div>';
+                html += '<div><strong style="color: #a855f7;">Urgency:</strong> ' + c.urgency + '</div>';
+                html += '<div><strong style="color: #a855f7;">Filed:</strong> ' + c.filed_date + '</div>';
+                html += '<div><strong style="color: #a855f7;">Loss:</strong> ₹' + c.financial_loss + '</div>';
+                html += '</div></div>';
+                
+                html += '<h3 style="color: #a855f7; margin: 1.5rem 0 0.8rem;">Complainant Details</h3>';
+                html += '<div style="background: rgba(99, 102, 241, 0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem;">';
+                html += '<div><strong>Name:</strong> ' + c.citizen_name + '</div>';
+                html += '<div style="margin-top: 0.5rem;"><strong>Contact:</strong> ' + c.contact + '</div>';
+                html += '<div style="margin-top: 0.5rem;"><strong>Email:</strong> ' + c.citizen_email + '</div>';
+                html += '<div style="margin-top: 0.5rem;"><strong>Address:</strong> ' + c.address + ', ' + c.city + '</div></div>';
+                
+                html += '<h3 style="color: #a855f7; margin: 1.5rem 0 0.8rem;">Incident Description</h3>';
+                html += '<div style="background: rgba(99, 102, 241, 0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem; line-height: 1.6;">' + c.description + '</div>';
+                
+                if (c.suspect_info) {
+                    html += '<h3 style="color: #a855f7; margin: 1.5rem 0 0.8rem;">Suspect Information</h3>';
+                    html += '<div style="background: rgba(99, 102, 241, 0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem;">' + c.suspect_info + '</div>';
+                }
+                
+                html += '<h3 style="color: #a855f7; margin: 1.5rem 0 0.8rem;">🔧 Update Case Status</h3>';
+                html += '<div style="background: rgba(99, 102, 241, 0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1.5rem;">';
+                html += '<select id="newStatus" style="width: 100%; padding: 0.8rem; border-radius: 8px; background: rgba(15, 23, 42, 0.8); color: #fff; border: 2px solid rgba(99, 102, 241, 0.3); margin-bottom: 1rem;">';
+                html += '<option value="Pending" ' + (c.status === 'Pending' ? 'selected' : '') + '>Pending</option>';
+                html += '<option value="Under Investigation" ' + (c.status === 'Under Investigation' ? 'selected' : '') + '>Under Investigation</option>';
+                html += '<option value="Closed" ' + (c.status === 'Closed' ? 'selected' : '') + '>Closed</option>';
+                html += '</select>';
+                html += '<textarea id="statusNote" placeholder="Add a note (optional)..." style="width: 100%; min-height: 80px; padding: 0.8rem; border-radius: 8px; background: rgba(15, 23, 42, 0.8); color: #fff; border: 2px solid rgba(99, 102, 241, 0.3); font-family: inherit; margin-bottom: 1rem;"></textarea>';
+                html += '<button class="btn btn-primary" onclick="updateCaseStatus(\'' + c.case_id + '\')" style="width: 100%;">✅ Update Status</button>';
+                html += '</div>';
+                
+                html += '</div>';
+                showModal('Manage Case - ' + c.case_id, html);
+            }
+        })
+        .catch(function(err) {
+            showAlert('Error loading case details', 'error');
+        });
+}
+
+function updateCaseStatus(caseId) {
+    var newStatus = document.getElementById('newStatus').value;
+    var note = document.getElementById('statusNote').value.trim();
+    
+    fetch(API_URL + '/officer/update-status', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            case_id: caseId,
+            officer_id: currentOfficer.officer_id,
+            new_status: newStatus,
+            note: note
+        })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.success) {
+            showAlert('Case status updated successfully!', 'success');
+            document.querySelector('div[style*="fixed"]').remove(); // Close modal
+            loadOfficerDashboard(); // Refresh dashboard
+        } else {
+            showAlert(data.message, 'error');
+        }
+    })
+    .catch(function(err) {
+        showAlert('Error updating status', 'error');
+    });
+}
+
+function loadCaseHistory(caseId) {
+  fetch(`${API_URL}/case-history/${caseId}`)
+    .then(r => r.json())
+    .then(d => {
+      if (d.success && d.history.length > 0) {
+        let html = '';
+        d.history.forEach(h => {
+          html += `
+            <li style="margin-bottom:10px;">
+              <strong>${new Date(h.timestamp).toLocaleString()}</strong><br>
+              ${h.changed_by} ${h.action_type.toLowerCase()} the case
+              ${h.previous_officer ? `from <em>${h.previous_officer}</em>` : ''}
+              ${h.new_officer ? `to <em>${h.new_officer}</em>` : ''}
+            </li>`;
+        });
+        document.getElementById('caseHistoryList').innerHTML = html;
+        document.getElementById('caseHistorySection').classList.remove('hidden');
+      } else {
+        document.getElementById('caseHistorySection').classList.add('hidden');
+      }
+    })
+    .catch(() => {
+      document.getElementById('caseHistorySection').classList.add('hidden');
+    });
+}
+
+
+function officerLogout() {
+    if (confirm('Are you sure you want to logout?')) {
+        currentOfficer = null;
+        showAlert('Logged out successfully', 'success');
+        showPage('home');
+    }
+}
+
+        document.addEventListener('DOMContentLoaded', function() {
+            showPage('home');
+            var fileInput = document.getElementById('complaintEvidence');
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    var preview = document.getElementById('filePreview');
+                    preview.innerHTML = '';
+                    if (this.files.length > 0) {
+                        var fl = document.createElement('div');
+                        fl.style.cssText = 'background: rgba(99, 102, 241, 0.1); padding: 1rem; border-radius: 10px; border: 1px solid rgba(99, 102, 241, 0.2);';
+                        var t = document.createElement('div');
+                        t.style.cssText = 'color: #a855f7; font-weight: 600; margin-bottom: 0.5rem;';
+                        t.textContent = 'Selected Files (' + this.files.length + '):';
+                        fl.appendChild(t);
+                        for (var i = 0; i < this.files.length; i++) {
+                            var fi = document.createElement('div');
+                            fi.style.cssText = 'color: #cbd5e1; padding: 0.3rem 0; font-size: 0.9rem;';
+                            fi.textContent = '📎 ' + this.files[i].name + ' (' + (this.files[i].size / 1024).toFixed(1) + ' KB)';
+                            fl.appendChild(fi);
+                        }
+                        preview.appendChild(fl);
+                    }
+                });
+            }
+            
+        });
+function loadCaseHistory(caseId) {
+  fetch(`${API_URL}/case-history/${caseId}`)
+    .then(res => res.json())
+    .then(data => {
+      const section = document.getElementById('caseHistorySection');
+      const list = document.getElementById('caseHistoryList');
+
+      if (data.success && data.history.length > 0) {
+        section.classList.remove('hidden');
+        list.innerHTML = data.history
+          .map(
+            h => `<li><strong>${h.changed_by}</strong> → ${h.new_officer || 'Admin'} (${h.action_type})</li>`
+          )
+          .join('');
+      } else {
+        section.classList.add('hidden');
+        list.innerHTML = '';
+      }
+    })
+    .catch(() => console.error('Error loading history'));
+}
+function viewComplaint(caseId) {
+  fetch(`${API_URL}/complaint/${caseId}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const c = data.complaint;
+        const details = `
+          <h3 style="color:#a855f7;">🧾 Complaint Details</h3>
+          <p><strong>Case ID:</strong> ${c.case_id}</p>
+          <p><strong>Crime Type:</strong> ${c.crime_type}</p>
+          <p><strong>Status:</strong> ${c.status}</p>
+          <p><strong>Urgency:</strong> ${c.urgency}</p>
+          <p><strong>Assigned Officer:</strong> ${c.officer_name || 'Unassigned'}</p>
+          <p><strong>Filed Date:</strong> ${c.filed_date}</p>
+        `;
+        document.getElementById('complaintsContainer').innerHTML = details;
+
+        
+        loadCaseHistory(caseId);
+      } else {
+        alert('Error loading complaint details');
+      }
+    })
+    .catch(() => alert('Failed to load complaint details.'));
+}
+
+    </script>
+</body>
+</html>
